@@ -19,7 +19,7 @@ body {
 .main-content {
   flex-grow: 1;
   overflow-y: auto;
-  padding-bottom: 80px; 
+  padding-bottom: 120px; /* Увеличили отступ снизу, чтобы плашка корзины не перекрывала контент */
 }
 
 /* Стили главного экрана */
@@ -38,11 +38,11 @@ body {
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 15px;
-  -ms-overflow-style: none; 
-  scrollbar-width: none; 
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 .categories-list::-webkit-scrollbar {
-  display: none; 
+  display: none; /* Chrome, Safari, Opera */
 }
 
 
@@ -135,14 +135,11 @@ body {
 /* Стили для плашки корзины */
 .cart-bar-container {
   position: fixed;
-  bottom: 0; 
+  bottom: 0; /* В будущем изменим, когда будет BottomNav */
   left: 0;
   right: 0;
   padding: 15px;
   background: transparent;
-  
-  /* --- ВОТ ИСПРАВЛЕНИЕ --- */
-  /* Эта строка говорит браузеру "игнорируй этот элемент, кликай как бы сквозь него" */
   pointer-events: none;
 }
 
@@ -152,9 +149,6 @@ body {
   padding: 10px;
   box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
   border: 1px solid #eee;
-
-  /* --- И ВОЗВРАЩАЕМ КЛИКИ ДЛЯ САМОЙ ПЛАШКИ --- */
-  /* А эта строка возвращает кликабельность для дочерних элементов */
   pointer-events: auto;
 }
 

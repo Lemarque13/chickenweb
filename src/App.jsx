@@ -29,7 +29,11 @@ function App() {
           <Route path="/cart" element={<CartScreen />} />
         </Routes>
       </main>
+
+      {/* Наша плашка корзины */}
       <CartBar />
+
+      {/* Здесь будет постоянная нижняя навигация (BottomNav) */}
     </div>
   );
 }

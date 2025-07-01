@@ -3,7 +3,8 @@ import { useCartStore } from '../state/cartStore';
 import { useNavigate } from 'react-router-dom';
 
 const CartBar = () => {
-  const { items, getTotalPrice } = useCartStore();
+  const items = useCartStore((state) => state.items);
+  const getTotalPrice = useCartStore((state) => state.getTotalPrice);
   const navigate = useNavigate();
 
   // Если в корзине нет товаров, ничего не показываем
@@ -12,19 +13,20 @@ const CartBar = () => {
   }
 
   const totalPrice = getTotalPrice();
+  // Стоимость доставки пока задана статично
+  const deliveryCost = 15000;
 
   return (
     <div className="cart-bar-container">
       <div className="cart-bar">
-        {/* Здесь будет стоимость доставки, пока статично */}
         <div className="delivery-info">
           <span>Стоимость доставки:</span>
-          <span>+15 000</span>
+          <span>+{deliveryCost.toLocaleString('ru-RU')}</span>
         </div>
         <button className="cart-button" onClick={() => navigate('/cart')}>
           <span>Корзина</span>
           {/* Общая сумма = цена товаров + доставка */}
-          <span>{(totalPrice + 15000).toLocaleString('ru-RU')}</span>
+          <span>{(totalPrice + deliveryCost).toLocaleString('ru-RU')}</span>
         </button>
       </div>
     </div>

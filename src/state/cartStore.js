@@ -1,30 +1,24 @@
 import { create } from 'zustand';
 
 export const useCartStore = create((set, get) => ({
-  items: [], 
+  items: [], // Массив товаров в корзине: [{...product, quantity: N}]
 
-  addToCart: (product) => {
-    // ЖУЧОК №1: Проверяем, вызывается ли эта функция вообще
-    console.log(`[STORE] Вызвана функция addToCart для товара: "${product.name}"`);
+  // --- Основные действия с корзиной ---
 
-    set((state) => {
-      const existingItem = state.items.find((item) => item.$id === product.$id);
-      let newItems;
-
-      if (existingItem) {
-        newItems = state.items.map((item) =>
+  addToCart: (product) => set((state) => {
+    const existingItem = state.items.find((item) => item.$id === product.$id);
+    if (existingItem) {
+      // Если товар уже есть, увеличиваем количество
+      return {
+        items: state.items.map((item) =>
           item.$id === product.$id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      } else {
-        newItems = [...state.items, { ...product, quantity: 1 }];
-      }
-
-      // ЖУЧОК №2: Смотрим, каким стало состояние корзины ПОСЛЕ изменения
-      console.log('[STORE] Новое состояние корзины:', newItems);
-      
-      return { items: newItems };
-    });
-  },
+        ),
+      };
+    } else {
+      // Если товара нет, добавляем с количеством 1
+      return { items: [...state.items, { ...product, quantity: 1 }] };
+    }
+  }),
 
   removeFromCart: (productId) => set((state) => ({
     items: state.items
@@ -34,11 +28,14 @@ export const useCartStore = create((set, get) => ({
         }
         return item;
       })
-      .filter((item) => item.quantity > 0), 
+      .filter((item) => item.quantity > 0), // Удаляем товар, если количество стало 0
   })),
 
   clearCart: () => set({ items: [] }),
 
+  // --- Вспомогательные функции для получения данных ---
+  
+  // Эта функция считает общую сумму всех товаров в корзине
   getTotalPrice: () => {
     return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
   },
