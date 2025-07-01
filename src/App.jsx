@@ -4,8 +4,9 @@ import WebApp from '@twa-dev/sdk';
 
 // Импортируем наши экраны и компоненты
 import HomeScreen from './screens/HomeScreen.jsx';
-import CartScreen from './screens/CartScreen.jsx'; // Подключаем реальный экран корзины
-import BottomNav from './components/BottomNav.jsx'; // Подключаем нижнюю навигацию
+import CartScreen from './screens/CartScreen.jsx';
+import BottomNav from './components/BottomNav.jsx';
+import Header from './components/Header.jsx'; // <-- Добавили импорт хедера
 
 // Временные заглушки для других экранов
 const ProfileScreen = () => <div style={{padding: '20px'}}>Экран профиля</div>;
@@ -20,6 +21,7 @@ function App() {
 
   return (
     <div className="app-container">
+      <Header /> {/* <-- Добавили хедер */}
       <main className="main-content">
         <Routes>
           <Route path="/" element={<HomeScreen />} />
@@ -29,8 +31,6 @@ function App() {
           <Route path="/cart" element={<CartScreen />} />
         </Routes>
       </main>
-
-      {/* Убрали CartBar, добавили BottomNav */}
       <BottomNav />
     </div>
   );
