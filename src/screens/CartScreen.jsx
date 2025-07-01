@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCartStore } from '../state/cartStore';
+import { databases, DATABASE_ID, ORDERS_COLLECTION_ID, ID } from '../lib/appwrite';
+import WebApp from '@twa-dev/sdk';
+import { useNavigate } from 'react-router-dom';
 
-// Этот компонент будет использоваться для отображения каждой позиции в корзине
+// Компонент для одной позиции в корзине (остается без изменений)
 const CartItem = ({ item }) => {
   const { addToCart, removeFromCart } = useCartStore();
-  const imageUrl = item.imageID; // Используем прямую ссылку из "обходного пути"
+  const imageUrl = item.imageID;
 
   return (
     <div className="cart-item">
@@ -24,16 +27,53 @@ const CartItem = ({ item }) => {
 
 // Основной компонент экрана корзины
 const CartScreen = () => {
-  // Получаем все необходимые данные и функции из хранилища
   const { items, getTotalPrice, clearCart } = useCartStore();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false); // Состояние для блокировки кнопки
 
   const totalPrice = getTotalPrice();
-  const deliveryCost = 15000; // Стоимость доставки пока задана статично
+  const deliveryCost = 15000;
 
-  // Функция для обработки нажатия на кнопку "Оформить заказ"
-  const handlePlaceOrder = () => {
-    // Пока просто выводим сообщение. В будущем здесь будет логика отправки заказа в Appwrite.
-    alert(`Заказ на сумму ${(totalPrice + deliveryCost).toLocaleString('ru-RU')} сум оформлен! (пока не по-настоящему)`);
+  // --- НОВАЯ ЛОГИКА ОФОРМЛЕНИЯ ЗАКАЗА ---
+  const handlePlaceOrder = async () => {
+    if (isLoading || items.length === 0) return; // Защита от повторных нажатий и пустой корзины
+
+    setIsLoading(true); // Блокируем кнопку
+
+    try {
+      // 1. Получаем данные о пользователе из Telegram
+      const userData = WebApp.initDataUnsafe?.user;
+
+      // 2. Формируем данные для отправки в Appwrite
+      const orderData = {
+        userID: userData?.id.toString() || 'unknown',
+        userName: `${userData?.first_name || ''} ${userData?.last_name || ''}`.trim(),
+        userPhone: 'not_provided', // Пока у нас нет поля для ввода телефона
+        items: JSON.stringify(items.map(item => ({id: item.$id, name: item.name, quantity: item.quantity, price: item.price }))),
+        totalAmount: totalPrice + deliveryCost,
+        deliveryCost: deliveryCost,
+        status: 'new', // Статус нового заказа
+      };
+
+      // 3. Отправляем данные в коллекцию 'Orders'
+      await databases.createDocument(
+        DATABASE_ID,
+        ORDERS_COLLECTION_ID,
+        ID.unique(), // Генерируем уникальный ID для заказа
+        orderData
+      );
+
+      // 4. Если все успешно
+      alert('Ваш заказ успешно оформлен!');
+      clearCart(); // Очищаем корзину
+      navigate('/'); // Перебрасываем на главный экран
+
+    } catch (error) {
+      console.error("Ошибка при оформлении заказа:", error);
+      alert("Не удалось оформить заказ. Пожалуйста, попробуйте позже.");
+    } finally {
+      setIsLoading(false); // Разблокируем кнопку в любом случае
+    }
   };
 
 
@@ -42,14 +82,15 @@ const CartScreen = () => {
       <div className="cart-header">
         <h1>Корзина</h1>
         {items.length > 0 && (
-          <button onClick={clearCart} className="clear-cart-btn">Очистить корзину</button>
+          <button onClick={clearCart} className="clear-cart-btn" disabled={isLoading}>
+            Очистить корзину
+          </button>
         )}
       </div>
 
       {items.length === 0 ? (
         <div className="cart-empty">
           <p>Ваша корзина пока пуста...</p>
-          <p>Добавьте что-нибудь с главного экрана, чтобы сделать заказ.</p>
         </div>
       ) : (
         <>
@@ -70,8 +111,8 @@ const CartScreen = () => {
               <span>Итого</span>
               <span>{(totalPrice + deliveryCost).toLocaleString('ru-RU')} сум</span>
             </div>
-            <button onClick={handlePlaceOrder} className="place-order-btn">
-              Оформить заказ
+            <button onClick={handlePlaceOrder} className="place-order-btn" disabled={isLoading}>
+              {isLoading ? 'Оформление...' : 'Оформить заказ'}
             </button>
           </div>
         </>
