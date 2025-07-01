@@ -1,0 +1,182 @@
+/* Общие стили */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--tg-theme-bg-color, #f0f0f0);
+  color: var(--tg-theme-text-color, #000000);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-bottom: 80px; 
+}
+
+/* Стили главного экрана */
+.loading-screen {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.home-screen {
+  padding: 10px;
+}
+
+.categories-list {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 15px;
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}
+.categories-list::-webkit-scrollbar {
+  display: none; 
+}
+
+
+.category-tab {
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #ffffff;
+  font-size: 1em;
+  white-space: nowrap;
+}
+
+/* Стили карточки товара */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.product-card {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.product-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.product-card h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.1em;
+  flex-grow: 1;
+}
+
+.product-card p {
+  margin: 0;
+  color: #333;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.add-to-cart-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  font-size: 1.5em;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+  cursor: pointer;
+}
+
+/* Стили для счетчика количества */
+.quantity-selector {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  border: 1px solid #007aff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.quantity-selector button {
+  background-color: transparent;
+  border: none;
+  font-size: 1.5em;
+  width: 33.33%;
+  padding: 8px 0;
+  cursor: pointer;
+  color: #007aff;
+}
+
+.quantity-selector span {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+/* Стили для плашки корзины */
+.cart-bar-container {
+  position: fixed;
+  bottom: 0; 
+  left: 0;
+  right: 0;
+  padding: 15px;
+  background: transparent;
+  
+  /* --- ВОТ ИСПРАВЛЕНИЕ --- */
+  /* Эта строка говорит браузеру "игнорируй этот элемент, кликай как бы сквозь него" */
+  pointer-events: none;
+}
+
+.cart-bar {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+  border: 1px solid #eee;
+
+  /* --- И ВОЗВРАЩАЕМ КЛИКИ ДЛЯ САМОЙ ПЛАШКИ --- */
+  /* А эта строка возвращает кликабельность для дочерних элементов */
+  pointer-events: auto;
+}
+
+.delivery-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9em;
+  color: #666;
+  padding: 0 5px 10px 5px;
+}
+
+.cart-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background-color: #28a745;
+  color: white;
+  font-size: 1.2em;
+  font-weight: bold;
+  cursor: pointer;
+}
