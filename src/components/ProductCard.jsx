@@ -14,17 +14,17 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="product-card">
-      <img src={imageUrl.href} alt={product.name} className="product-image" />
+      {/* --- ВОТ ИСПРАВЛЕНИЕ: Убираем .href в конце imageUrl --- */}
+      <img src={imageUrl} alt={product.name} className="product-image" />
+      
       <h4>{product.name}</h4>
       <p>{product.price.toLocaleString('ru-RU')} сум</p>
 
-      {/* Условие: если товара нет в корзине, показываем кнопку "+". */}
       {!itemInCart ? (
         <button className="add-to-cart-btn" onClick={() => addToCart(product)}>
           +
         </button>
       ) : (
-        // Если товар уже в корзине, показываем счетчик
         <div className="quantity-selector">
           <button onClick={() => removeFromCart(product.$id)}>−</button>
           <span>{itemInCart.quantity}</span>

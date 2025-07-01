@@ -4,13 +4,13 @@ import WebApp from '@twa-dev/sdk';
 
 // Импортируем наши экраны и компоненты
 import HomeScreen from './screens/HomeScreen.jsx';
-import CartBar from './components/CartBar.jsx';
+import CartScreen from './screens/CartScreen.jsx'; // Подключаем реальный экран корзины
+import BottomNav from './components/BottomNav.jsx'; // Подключаем нижнюю навигацию
 
 // Временные заглушки для других экранов
-const CartScreen = () => <div>Экран корзины</div>;
-const ProfileScreen = () => <div>Экран профиля</div>;
-const SearchScreen = () => <div>Экран поиска</div>;
-const FavoritesScreen = () => <div>Экран избранного</div>;
+const ProfileScreen = () => <div style={{padding: '20px'}}>Экран профиля</div>;
+const SearchScreen = () => <div style={{padding: '20px'}}>Экран поиска</div>;
+const FavoritesScreen = () => <div style={{padding: '20px'}}>Экран избранного</div>;
 
 function App() {
   useEffect(() => {
@@ -30,10 +30,8 @@ function App() {
         </Routes>
       </main>
 
-      {/* Наша плашка корзины */}
-      <CartBar />
-
-      {/* Здесь будет постоянная нижняя навигация (BottomNav) */}
+      {/* Убрали CartBar, добавили BottomNav */}
+      <BottomNav />
     </div>
   );
 }
