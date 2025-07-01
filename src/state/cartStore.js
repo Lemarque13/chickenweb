@@ -1,21 +1,50 @@
 import { create } from 'zustand';
 
+// --- Логика для сохранения и загрузки избранного из памяти телефона ---
+const loadFavoritesFromStorage = () => {
+  try {
+    const favorites = localStorage.getItem('favorites');
+    return favorites ? JSON.parse(favorites) : [];
+  } catch (error) {
+    console.error("Could not load favorites from local storage", error);
+    return [];
+  }
+};
+
+const saveFavoritesToStorage = (favorites) => {
+  try {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  } catch (error) {
+    console.error("Could not save favorites to local storage", error);
+  }
+};
+
+
 export const useCartStore = create((set, get) => ({
-  items: [], // Массив товаров в корзине: [{...product, quantity: N}]
+  items: [],
+  favorites: loadFavoritesFromStorage(), // Загружаем избранное при инициализации
 
-  // --- Основные действия с корзиной ---
+  // --- Действия с избранным ---
+  toggleFavorite: (productId) => {
+    const favorites = get().favorites;
+    const newFavorites = favorites.includes(productId)
+      ? favorites.filter(id => id !== productId) // Удалить, если уже есть
+      : [...favorites, productId]; // Добавить, если нет
 
+    saveFavoritesToStorage(newFavorites); // Сохраняем в память
+    set({ favorites: newFavorites }); // Обновляем состояние
+  },
+
+  // --- Действия с корзиной (остаются без изменений) ---
   addToCart: (product) => set((state) => {
     const existingItem = state.items.find((item) => item.$id === product.$id);
     if (existingItem) {
-      // Если товар уже есть, увеличиваем количество
       return {
         items: state.items.map((item) =>
           item.$id === product.$id ? { ...item, quantity: item.quantity + 1 } : item
         ),
       };
     } else {
-      // Если товара нет, добавляем с количеством 1
       return { items: [...state.items, { ...product, quantity: 1 }] };
     }
   }),
@@ -28,14 +57,11 @@ export const useCartStore = create((set, get) => ({
         }
         return item;
       })
-      .filter((item) => item.quantity > 0), // Удаляем товар, если количество стало 0
+      .filter((item) => item.quantity > 0),
   })),
 
   clearCart: () => set({ items: [] }),
-
-  // --- Вспомогательные функции для получения данных ---
   
-  // Эта функция считает общую сумму всех товаров в корзине
   getTotalPrice: () => {
     return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
   },
