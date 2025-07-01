@@ -13,6 +13,5 @@ export const DATABASE_ID = '6863d346000a815c6808';
 export const PRODUCTS_COLLECTION_ID = 'Products';
 export const CATEGORIES_COLLECTION_ID = 'Categories';
 
-// --- ВОТ ИСПРАВЛЕНИЕ ---
-// Заменяем 'product-images' на реальный ID вашего хранилища
+// УБЕДИТЕСЬ, ЧТО ЗДЕСЬ СТОИТ ПРАВИЛЬНЫЙ ID, А НЕ 'product-images'
 export const PRODUCT_IMAGES_BUCKET_ID = '6863d354a002bb4ca973';
