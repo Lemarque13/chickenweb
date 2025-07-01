@@ -16,7 +16,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="product-card">
-      <img src={imageUrl} alt={product.name} className="product-image" />
+      <img src={product.imageID} alt={product.name} className="product-image" />
       
       <h4>{product.name}</h4>
       <p>{product.price.toLocaleString('ru-RU')} сум</p>
