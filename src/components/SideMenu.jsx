@@ -2,19 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { databases, DATABASE_ID, INFO_PAGES_COLLECTION_ID } from '../lib/appwrite';
 
-const SideMenu = ({ isOpen, onClose }) => {
+// Теперь компонент принимает currentTheme и setTheme
+const SideMenu = ({ isOpen, onClose, currentTheme, setTheme }) => {
   const [pages, setPages] = useState([]);
 
   useEffect(() => {
-    // Загружаем список инфо-страниц при первом открытии меню
     if (isOpen && pages.length === 0) {
       const fetchPages = async () => {
         try {
           const response = await databases.listDocuments(DATABASE_ID, INFO_PAGES_COLLECTION_ID);
           setPages(response.documents);
-        } catch (error) {
-          console.error("Failed to fetch info pages", error);
-        }
+        } catch (error) { console.error("Failed to fetch info pages", error); }
       };
       fetchPages();
     }
@@ -24,8 +22,16 @@ const SideMenu = ({ isOpen, onClose }) => {
     return null;
   }
 
+  const ThemeButton = ({ theme, children }) => (
+    <button
+      className={`theme-btn ${currentTheme === theme ? 'active' : ''}`}
+      onClick={() => setTheme(theme)}
+    >
+      {children}
+    </button>
+  );
+
   return (
-    // Оверлей, который затемняет фон и закрывает меню по клику
     <div className="side-menu-overlay" onClick={onClose}>
       <div className="side-menu" onClick={(e) => e.stopPropagation()}>
         <button onClick={onClose} className="close-menu-btn">×</button>
@@ -36,8 +42,17 @@ const SideMenu = ({ isOpen, onClose }) => {
               {page.title}
             </Link>
           ))}
-          {/* Можно добавить и другие ссылки, не из базы данных */}
         </nav>
+
+        {/* --- НОВЫЙ БЛОК ПЕРЕКЛЮЧЕНИЯ ТЕМЫ --- */}
+        <div className="theme-switcher">
+          <h4>Тема</h4>
+          <div className="theme-options">
+            <ThemeButton theme="light">Светлая</ThemeButton>
+            <ThemeButton theme="dark">Темная</ThemeButton>
+            <ThemeButton theme="system">Системная</ThemeButton>
+          </div>
+        </div>
       </div>
     </div>
   );
