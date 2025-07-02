@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'; // Добавили useMemo
+import React, { useState, useEffect, useMemo } from 'react';
 import { databases, DATABASE_ID, CATEGORIES_COLLECTION_ID, PRODUCTS_COLLECTION_ID } from '../lib/appwrite';
 import ProductCard from '../components/ProductCard';
 
@@ -33,15 +33,26 @@ const HomeScreen = () => {
     fetchData();
   }, []);
 
-  // --- НОВАЯ ЛОГИКА ФИЛЬТРАЦИИ ---
-  const filteredProducts = useMemo(() => {
-    // Если ни одна категория не выбрана, или нет категорий, показываем все товары
-    if (!activeCategory || categories.length === 0) {
-      return products;
+  // --- НОВАЯ ЛОГИКА ПРОКРУТКИ ---
+  const handleCategoryClick = (categoryId) => {
+    // 1. Устанавливаем активную категорию для подсветки кнопки
+    setActiveCategory(categoryId);
+
+    // 2. Находим первый товар, который соответствует этой категории
+    // Сначала отсортируем все товары, чтобы они шли по порядку категорий
+    const firstProductInCategory = products
+      .sort((a, b) => a.categoryID.localeCompare(b.categoryID))
+      .find(p => p.categoryID === categoryId);
+    
+    if (firstProductInCategory) {
+      // 3. Находим соответствующий элемент на странице по его ID
+      const element = document.getElementById(`product-${firstProductInCategory.$id}`);
+      if (element) {
+        // 4. Плавно прокручиваем к нему
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
-    // Иначе фильтруем товары по ID активной категории
-    return products.filter(product => product.categoryID === activeCategory);
-  }, [activeCategory, products, categories]);
+  };
 
 
   if (isLoading) {
@@ -55,17 +66,21 @@ const HomeScreen = () => {
           <button 
             key={category.$id} 
             className={`category-tab ${activeCategory === category.$id ? 'active' : ''}`}
-            onClick={() => setActiveCategory(category.$id)}
+            // Вызываем нашу новую функцию при клике
+            onClick={() => handleCategoryClick(category.$id)}
           >
             {category.name}
           </button>
         ))}
       </div>
 
-      {/* Теперь мы отображаем отфильтрованный список */}
+      {/* Мы снова отображаем ВСЕ товары, а не отфильтрованные */}
       <div className="products-grid">
-        {filteredProducts.map(product => (
-          <ProductCard key={product.$id} product={product} />
+        {products.map(product => (
+          // Оборачиваем карточку в div с уникальным ID для прокрутки
+          <div id={`product-${product.$id}`} key={product.$id}>
+            <ProductCard product={product} />
+          </div>
         ))}
       </div>
     </div>
