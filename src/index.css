@@ -28,7 +28,7 @@ body {
   margin: 0 auto;
   position: relative;
   background-color: #fff;
-  overflow: hidden; 
+  overflow: hidden; /* Важно для анимации меню */
 }
 
 /* --- Стили для Шапки (Header) --- */
@@ -49,12 +49,12 @@ body {
 .header-actions { display: flex; align-items: center; gap: 15px; }
 .header-actions div { cursor: pointer; }
 
+
 /* --- Основной контент --- */
 .main-content {
   flex-grow: 1;
   overflow-y: auto;
-  /* Увеличиваем нижний отступ, чтобы было место для двух панелей */
-  padding: 0 0 150px 0; 
+  padding: 0 0 80px 0;
   background-color: var(--tg-bg-color);
 }
 
@@ -91,13 +91,12 @@ body {
 /* --- Стили для плашки корзины --- */
 .cart-bar-container {
   position: fixed;
-  /* Позиционируем плашку над нижней навигацией (высота навигации 60px) */
   bottom: 60px; 
   left: 0;
   right: 0;
-  max-width: 500px; /* Важно для центрирования на больших экранах */
+  max-width: 500px;
   margin: 0 auto;
-  padding: 0 15px 15px 15px; /* Добавляем отступ снизу */
+  padding: 0 15px 15px 15px;
   background: transparent;
   pointer-events: none;
   z-index: 9;
