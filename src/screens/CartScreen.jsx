@@ -4,7 +4,6 @@ import { databases, DATABASE_ID, ORDERS_COLLECTION_ID, ID } from '../lib/appwrit
 import WebApp from '@twa-dev/sdk';
 import { useNavigate } from 'react-router-dom';
 
-// Компонент для одной позиции в корзине (остается без изменений)
 const CartItem = ({ item }) => {
   const { addToCart, removeFromCart } = useCartStore();
   const imageUrl = item.imageID;
@@ -25,57 +24,52 @@ const CartItem = ({ item }) => {
   );
 };
 
-// Основной компонент экрана корзины
 const CartScreen = () => {
   const { items, getTotalPrice, clearCart } = useCartStore();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false); // Состояние для блокировки кнопки
+  const [isLoading, setIsLoading] = useState(false);
+  // --- НОВОЕ СОСТОЯНИЕ ДЛЯ СПОСОБА ОПЛАТЫ ---
+  const [paymentMethod, setPaymentMethod] = useState('cash'); // 'cash' или 'click'
 
   const totalPrice = getTotalPrice();
   const deliveryCost = 15000;
 
-  // --- НОВАЯ ЛОГИКА ОФОРМЛЕНИЯ ЗАКАЗА ---
   const handlePlaceOrder = async () => {
-    if (isLoading || items.length === 0) return; // Защита от повторных нажатий и пустой корзины
-
-    setIsLoading(true); // Блокируем кнопку
+    if (isLoading || items.length === 0) return;
+    setIsLoading(true);
 
     try {
-      // 1. Получаем данные о пользователе из Telegram
       const userData = WebApp.initDataUnsafe?.user;
 
-      // 2. Формируем данные для отправки в Appwrite
       const orderData = {
         userID: userData?.id.toString() || 'unknown',
         userName: `${userData?.first_name || ''} ${userData?.last_name || ''}`.trim(),
-        userPhone: 'not_provided', // Пока у нас нет поля для ввода телефона
+        userPhone: 'not_provided',
         items: JSON.stringify(items.map(item => ({id: item.$id, name: item.name, quantity: item.quantity, price: item.price }))),
         totalAmount: totalPrice + deliveryCost,
         deliveryCost: deliveryCost,
-        status: 'new', // Статус нового заказа
+        status: 'new',
+        paymentMethod: paymentMethod, // <-- ДОБАВЛЯЕМ СПОСОБ ОПЛАТЫ
       };
 
-      // 3. Отправляем данные в коллекцию 'Orders'
       await databases.createDocument(
         DATABASE_ID,
         ORDERS_COLLECTION_ID,
-        ID.unique(), // Генерируем уникальный ID для заказа
+        ID.unique(),
         orderData
       );
 
-      // 4. Если все успешно
       alert('Ваш заказ успешно оформлен!');
-      clearCart(); // Очищаем корзину
-      navigate('/'); // Перебрасываем на главный экран
+      clearCart();
+      navigate('/');
 
     } catch (error) {
       console.error("Ошибка при оформлении заказа:", error);
       alert("Не удалось оформить заказ. Пожалуйста, попробуйте позже.");
     } finally {
-      setIsLoading(false); // Разблокируем кнопку в любом случае
+      setIsLoading(false);
     }
   };
-
 
   return (
     <div className="cart-screen">
@@ -107,6 +101,26 @@ const CartScreen = () => {
               <span>Доставка</span>
               <span>{deliveryCost.toLocaleString('ru-RU')} сум</span>
             </div>
+            
+            {/* --- НОВЫЙ БЛОК ДЛЯ ВЫБОРА ОПЛАТЫ --- */}
+            <div className="payment-methods">
+              <h4>Способ оплаты</h4>
+              <div className="payment-options">
+                <button 
+                  className={`payment-btn ${paymentMethod === 'cash' ? 'active' : ''}`}
+                  onClick={() => setPaymentMethod('cash')}
+                >
+                  Наличные
+                </button>
+                <button 
+                  className={`payment-btn ${paymentMethod === 'click' ? 'active' : ''}`}
+                  onClick={() => setPaymentMethod('click')}
+                >
+                  Click Pay
+                </button>
+              </div>
+            </div>
+
             <div className="summary-row total">
               <span>Итого</span>
               <span>{(totalPrice + deliveryCost).toLocaleString('ru-RU')} сум</span>

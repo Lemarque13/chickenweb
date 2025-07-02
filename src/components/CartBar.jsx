@@ -1,14 +1,16 @@
 import React from 'react';
 import { useCartStore } from '../state/cartStore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // <-- Добавили useLocation
 
 const CartBar = () => {
   const items = useCartStore((state) => state.items);
   const getTotalPrice = useCartStore((state) => state.getTotalPrice);
   const navigate = useNavigate();
+  const location = useLocation(); // <-- Получаем информацию о текущем URL
 
-  // Если в корзине нет товаров, ничего не показываем
-  if (items.length === 0) {
+  // --- НОВОЕ УСЛОВИЕ ---
+  // Если в корзине нет товаров ИЛИ мы на странице корзины, ничего не показываем
+  if (items.length === 0 || location.pathname === '/cart') {
     return null;
   }
 
