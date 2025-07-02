@@ -28,13 +28,20 @@ const CartScreen = () => {
   const { items, getTotalPrice, clearCart } = useCartStore();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  // --- НОВОЕ СОСТОЯНИЕ ДЛЯ СПОСОБА ОПЛАТЫ ---
-  const [paymentMethod, setPaymentMethod] = useState('cash'); // 'cash' или 'click'
+  const [paymentMethod, setPaymentMethod] = useState('cash');
+  // --- НОВЫЕ СОСТОЯНИЯ ДЛЯ АДРЕСА И КОММЕНТАРИЯ ---
+  const [address, setAddress] = useState('');
+  const [comments, setComments] = useState('');
 
   const totalPrice = getTotalPrice();
   const deliveryCost = 15000;
 
   const handlePlaceOrder = async () => {
+    // Проверяем, что адрес введен
+    if (!address.trim()) {
+      alert('Пожалуйста, укажите адрес доставки.');
+      return;
+    }
     if (isLoading || items.length === 0) return;
     setIsLoading(true);
 
@@ -49,7 +56,9 @@ const CartScreen = () => {
         totalAmount: totalPrice + deliveryCost,
         deliveryCost: deliveryCost,
         status: 'new',
-        paymentMethod: paymentMethod, // <-- ДОБАВЛЯЕМ СПОСОБ ОПЛАТЫ
+        paymentMethod: paymentMethod,
+        address: address, // <-- ДОБАВЛЯЕМ АДРЕС
+        comments: comments, // <-- ДОБАВЛЯЕМ КОММЕНТАРИЙ
       };
 
       await databases.createDocument(
@@ -102,7 +111,29 @@ const CartScreen = () => {
               <span>{deliveryCost.toLocaleString('ru-RU')} сум</span>
             </div>
             
-            {/* --- НОВЫЙ БЛОК ДЛЯ ВЫБОРА ОПЛАТЫ --- */}
+            {/* --- НОВЫЕ ПОЛЯ ДЛЯ АДРЕСА И КОММЕНТАРИЕВ --- */}
+            <div className="form-group">
+              <label htmlFor="address">Адрес доставки</label>
+              <input 
+                id="address"
+                type="text" 
+                value={address} 
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Город, улица, дом, квартира"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="comments">Комментарий к заказу</label>
+              <textarea 
+                id="comments"
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+                rows="3"
+                placeholder="Например, код от домофона или просьба не звонить в дверь"
+              />
+            </div>
+
             <div className="payment-methods">
               <h4>Способ оплаты</h4>
               <div className="payment-options">

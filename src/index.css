@@ -184,3 +184,28 @@ body {
   color: var(--tg-button-text-color, #ffffff);
   font-weight: bold;
 }
+/* --- Стили для полей формы в корзине --- */
+.cart-summary .form-group {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+.cart-summary .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1em;
+  font-weight: 600;
+}
+.cart-summary .form-group input,
+.cart-summary .form-group textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 1em;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box; /* Чтобы padding не влиял на ширину */
+  font-family: inherit; /* Наследуем шрифт */
+}
+.cart-summary .form-group textarea {
+  resize: vertical; /* Разрешаем менять высоту */
+}
