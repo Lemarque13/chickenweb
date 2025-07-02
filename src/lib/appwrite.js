@@ -1,4 +1,4 @@
-import { Client, Databases, Storage, ID, Query } from 'appwrite'; // Добавили Query
+import { Client, Databases, Storage, Query, ID } from 'appwrite';
 
 const APPWRITE_ENDPOINT = 'https://fra.cloud.appwrite.io/v1'; 
 const APPWRITE_PROJECT_ID = '6863d2f000114af88d7f'; 
@@ -7,12 +7,11 @@ export const client = new Client();
 client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT_ID);
 
 export const databases = new Databases(client);
-export const storage = new Storage(client);
-export { ID, Query }; // <-- Экспортируем Query для запросов
+export const storage = new Storage(client); // Убедитесь, что storage экспортируется
+export { ID, Query };
 
 export const DATABASE_ID = '6863d346000a815c6808';
 export const PRODUCTS_COLLECTION_ID = 'Products';
 export const CATEGORIES_COLLECTION_ID = 'Categories';
-export const ORDERS_COLLECTION_ID = 'Orders';
-export const INFO_PAGES_COLLECTION_ID = 'InfoPages'; // <-- Добавили ID новой коллекции
-export const PRODUCT_IMAGES_BUCKET_ID = '6863d354a002bb4ca973';
+export const INFO_PAGES_COLLECTION_ID = 'InfoPages';
+export const PRODUCT_IMAGES_BUCKET_ID = '6863d354a002bb4ca973'; // Убедитесь, что здесь правильный ID
