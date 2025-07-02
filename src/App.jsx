@@ -6,15 +6,13 @@ import WebApp from '@twa-dev/sdk';
 import HomeScreen from './screens/HomeScreen.jsx';
 import CartScreen from './screens/CartScreen.jsx';
 import InfoPageScreen from './screens/InfoPageScreen.jsx';
-import FavoritesScreen from './screens/FavoritesScreen.jsx'; // <-- Подключаем реальный экран
-import ProfileScreen from './screens/ProfileScreen.jsx';   // <-- Подключаем реальный экран
+import FavoritesScreen from './screens/FavoritesScreen.jsx';
+import ProfileScreen from './screens/ProfileScreen.jsx';
+import SearchScreen from './screens/SearchScreen.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import Header from './components/Header.jsx';
 import SideMenu from './components/SideMenu.jsx';
-
-// Убираем последние заглушки, оставляем только для Поиска
-const SearchScreen = () => <div style={{padding: '20px'}}>Экран поиска</div>;
-
+import CartBar from './components/CartBar.jsx'; // <-- Снова импортируем нашу плашку
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,6 +37,9 @@ function App() {
         </Routes>
       </main>
 
+      {/* Размещаем плашку корзины здесь, над нижней навигацией */}
+      <CartBar />
+      
       <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       
       <BottomNav />
