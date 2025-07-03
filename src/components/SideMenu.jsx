@@ -7,12 +7,14 @@ const SideMenu = ({ isOpen, onClose, currentTheme, setTheme }) => {
   const [pages, setPages] = useState([]);
 
   useEffect(() => {
-    if (isOpen && pages.length === 0) {
+    if (isOpen && pages.length === 0) { // Загружаем страницы только один раз при открытии, если их нет
       const fetchPages = async () => {
         try {
           const response = await databases.listDocuments(DATABASE_ID, INFO_PAGES_COLLECTION_ID);
           setPages(response.documents);
-        } catch (error) { console.error("Failed to fetch info pages", error); }
+        } catch (error) { 
+          console.error("Failed to fetch info pages", error); 
+        }
       };
       fetchPages();
     }
@@ -22,10 +24,11 @@ const SideMenu = ({ isOpen, onClose, currentTheme, setTheme }) => {
     return null;
   }
 
+  // Вспомогательный компонент для кнопок темы
   const ThemeButton = ({ theme, children }) => (
     <button
       className={`theme-btn ${currentTheme === theme ? 'active' : ''}`}
-      onClick={() => setTheme(theme)}
+      onClick={() => setTheme(theme)} // Вызываем функцию смены темы
     >
       {children}
     </button>
@@ -44,7 +47,7 @@ const SideMenu = ({ isOpen, onClose, currentTheme, setTheme }) => {
           ))}
         </nav>
 
-        {/* --- НОВЫЙ БЛОК ПЕРЕКЛЮЧЕНИЯ ТЕМЫ --- */}
+        {/* --- БЛОК ПЕРЕКЛЮЧЕНИЯ ТЕМЫ --- */}
         <div className="theme-switcher">
           <h4>Тема</h4>
           <div className="theme-options">
@@ -53,6 +56,8 @@ const SideMenu = ({ isOpen, onClose, currentTheme, setTheme }) => {
             <ThemeButton theme="system">Системная</ThemeButton>
           </div>
         </div>
+
+        {/* Здесь можно добавить другие элементы меню */}
       </div>
     </div>
   );
