@@ -1,27 +1,15 @@
 import React from 'react';
 import { useCartStore } from '../state/cartStore';
-import { storage, PRODUCT_IMAGES_BUCKET_ID } from '../lib/appwrite';
+
+// Убираем все импорты из Appwrite, они здесь больше не нужны для картинки
 
 const ProductCard = ({ product }) => {
-  // --- ИЗМЕНЕНИЕ: Получаем каждый нужный нам кусок состояния отдельно ---
-  const items = useCartStore((state) => state.items);
-  const favorites = useCartStore((state) => state.favorites);
-  const addToCart = useCartStore((state) => state.addToCart);
-  const removeFromCart = useCartStore((state) => state.removeFromCart);
-  const toggleFavorite = useCartStore((state) => state.toggleFavorite);
-
+  const { items, favorites, addToCart, removeFromCart, toggleFavorite } = useCartStore();
   const itemInCart = items.find((item) => item.$id === product.$id);
   const isFavorite = favorites.includes(product.$id);
 
-  let imageUrl = ''; 
-  if (product && product.imageID) {
-    try {
-      const urlObject = storage.getFileView(PRODUCT_IMAGES_BUCKET_ID, product.imageID);
-      imageUrl = urlObject.href;
-    } catch (error) {
-      console.error(`Could not get image URL for product ${product.name}`, error);
-    }
-  }
+  // --- ИЗМЕНЕНИЕ: Просто берем готовую ссылку из базы данных ---
+  const imageUrl = product.imageID;
 
   return (
     <div className="product-card">
@@ -36,9 +24,7 @@ const ProductCard = ({ product }) => {
       <p>{product.price.toLocaleString('ru-RU')} сум</p>
 
       {!itemInCart ? (
-        <button className="add-to-cart-btn" onClick={() => addToCart(product)}>
-          +
-        </button>
+        <button className="add-to-cart-btn" onClick={() => addToCart(product)}>+</button>
       ) : (
         <div className="quantity-selector">
           <button onClick={() => removeFromCart(product.$id)}>−</button>
