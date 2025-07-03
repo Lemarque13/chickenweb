@@ -123,3 +123,20 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'R
 .payment-options { display: flex; gap: 10px; }
 .payment-btn { flex-grow: 1; padding: 12px; font-size: 1em; font-weight: 500; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--secondary-bg-color, #f0f0f0); color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
 .payment-btn.active { border-color: var(--active-color); background-color: var(--active-color); color: var(--button-text-color); font-weight: bold; }
+/* Стили для красивого пустого экрана Избранного */
+.favorites-empty-styled {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 20px;
+  height: 100%;
+  color: var(--hint-color);
+}
+
+.favorites-empty-styled h2 {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-top: 20px;
+}
