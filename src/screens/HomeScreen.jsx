@@ -33,22 +33,17 @@ const HomeScreen = () => {
     fetchData();
   }, []);
 
-  // --- НОВАЯ ЛОГИКА ПРОКРУТКИ ---
+  // --- ЛОГИКА ПРОКРУТКИ К КАТЕГОРИИ ---
   const handleCategoryClick = (categoryId) => {
-    // 1. Устанавливаем активную категорию для подсветки кнопки
     setActiveCategory(categoryId);
 
-    // 2. Находим первый товар, который соответствует этой категории
-    // Сначала отсортируем все товары, чтобы они шли по порядку категорий
-    const firstProductInCategory = products
-      .sort((a, b) => a.categoryID.localeCompare(b.categoryID))
-      .find(p => p.categoryID === categoryId);
+    // Находим первый товар, который соответствует этой категории
+    const firstProductInCategory = products.find(p => p.categoryID === categoryId);
     
     if (firstProductInCategory) {
-      // 3. Находим соответствующий элемент на странице по его ID
       const element = document.getElementById(`product-${firstProductInCategory.$id}`);
       if (element) {
-        // 4. Плавно прокручиваем к нему
+        // Плавно прокручиваем к нему
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
@@ -59,6 +54,17 @@ const HomeScreen = () => {
     return <div className="loading-screen">Загрузка...</div>;
   }
 
+  // --- СОРТИРОВКА ТОВАРОВ ПО КАТЕГОРИЯМ ДЛЯ КОРРЕКТНОЙ РАБОТЫ ПРОКРУТКИ ---
+  const sortedProducts = useMemo(() => {
+    // Создаем карту для быстрой привязки категории к ее порядку
+    const categoryOrderMap = new Map(categories.map(cat => [cat.$id, cat.order]));
+    return [...products].sort((a, b) => {
+      const orderA = categoryOrderMap.get(a.categoryID) || 999;
+      const orderB = categoryOrderMap.get(b.categoryID) || 999;
+      return orderA - orderB;
+    });
+  }, [products, categories]);
+
   return (
     <div className="home-screen">
       <div className="categories-list">
@@ -66,7 +72,6 @@ const HomeScreen = () => {
           <button 
             key={category.$id} 
             className={`category-tab ${activeCategory === category.$id ? 'active' : ''}`}
-            // Вызываем нашу новую функцию при клике
             onClick={() => handleCategoryClick(category.$id)}
           >
             {category.name}
@@ -74,10 +79,9 @@ const HomeScreen = () => {
         ))}
       </div>
 
-      {/* Мы снова отображаем ВСЕ товары, а не отфильтрованные */}
       <div className="products-grid">
-        {products.map(product => (
-          // Оборачиваем карточку в div с уникальным ID для прокрутки
+        {/* Отображаем отсортированный список */}
+        {sortedProducts.map(product => (
           <div id={`product-${product.$id}`} key={product.$id}>
             <ProductCard product={product} />
           </div>
