@@ -29,7 +29,6 @@ const CartScreen = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('cash');
-  // --- НОВЫЕ СОСТОЯНИЯ ДЛЯ АДРЕСА И КОММЕНТАРИЯ ---
   const [address, setAddress] = useState('');
   const [comments, setComments] = useState('');
 
@@ -37,7 +36,6 @@ const CartScreen = () => {
   const deliveryCost = 15000;
 
   const handlePlaceOrder = async () => {
-    // Проверяем, что адрес введен
     if (!address.trim()) {
       alert('Пожалуйста, укажите адрес доставки.');
       return;
@@ -57,8 +55,8 @@ const CartScreen = () => {
         deliveryCost: deliveryCost,
         status: 'new',
         paymentMethod: paymentMethod,
-        address: address, // <-- ДОБАВЛЯЕМ АДРЕС
-        comments: comments, // <-- ДОБАВЛЯЕМ КОММЕНТАРИЙ
+        address: address,
+        comments: comments,
       };
 
       await databases.createDocument(
@@ -111,7 +109,6 @@ const CartScreen = () => {
               <span>{deliveryCost.toLocaleString('ru-RU')} сум</span>
             </div>
             
-            {/* --- НОВЫЕ ПОЛЯ ДЛЯ АДРЕСА И КОММЕНТАРИЕВ --- */}
             <div className="form-group">
               <label htmlFor="address">Адрес доставки</label>
               <input 
