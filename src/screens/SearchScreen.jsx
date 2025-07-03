@@ -1,43 +1,43 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { databases, DATABASE_ID, PRODUCTS_COLLECTION_ID } from '../lib/appwrite';
+import { databases, DATABASE_ID, CATEGORIES_COLLECTION_ID } from '../lib/appwrite';
 import { Link } from 'react-router-dom';
 
 const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [allProducts, setAllProducts] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Загружаем все товары один раз при первом рендере компонента
   useEffect(() => {
-    const fetchAllProducts = async () => {
+    const fetchCategories = async () => {
       try {
         const response = await databases.listDocuments(
           DATABASE_ID, 
-          PRODUCTS_COLLECTION_ID
+          CATEGORIES_COLLECTION_ID
         );
-        setAllProducts(response.documents);
+        const sortedCategories = response.documents.sort((a, b) => a.order - b.order);
+        setAllCategories(sortedCategories);
       } catch (error) {
-        console.error("Failed to fetch products for search", error);
+        console.error("Failed to fetch categories for search", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchAllProducts();
+    fetchCategories();
   }, []);
 
-  // Фильтруем товары на основе того, что введено в поле поиска
-  const filteredProducts = useMemo(() => {
+  const filteredCategories = useMemo(() => {
+    // Добавляем проверку, что allCategories - это массив
+    if (!Array.isArray(allCategories)) return [];
     if (!searchQuery) {
-      return []; // Если в поиске пусто, ничего не показываем
+      return allCategories;
     }
-    return allProducts.filter(product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    return allCategories.filter(category =>
+      category.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery, allProducts]);
-
+  }, [searchQuery, allCategories]);
 
   return (
-    <div className="search-screen">
+    <div className="search-screen-new">
       <div className="search-bar">
         <input
           type="text"
@@ -47,21 +47,18 @@ const SearchScreen = () => {
         />
       </div>
 
-      {isLoading && <p>Загрузка товаров...</p>}
+      {isLoading && <p className="loading-screen">Загрузка категорий...</p>}
       
-      <div className="search-results-list">
-        {searchQuery && filteredProducts.length === 0 && !isLoading && (
-          <p className="no-results">По вашему запросу ничего не найдено.</p>
+      <div className="search-category-list">
+        {!isLoading && filteredCategories.length === 0 ? (
+          <p className="no-results">Категории не найдены.</p>
+        ) : (
+          filteredCategories.map(category => (
+            <Link to={`/`} key={category.$id} className="search-category-item">
+              {category.name}
+            </Link>
+          ))
         )}
-        {filteredProducts.map(product => (
-          <Link to={`/`} key={product.$id} className="search-result-item">
-            <img src={product.imageID} alt={product.name} />
-            <div className="search-result-details">
-              <h4>{product.name}</h4>
-              <p>{product.price.toLocaleString('ru-RU')} сум</p>
-            </div>
-          </Link>
-        ))}
       </div>
     </div>
   );

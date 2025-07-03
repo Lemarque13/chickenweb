@@ -6,11 +6,8 @@ import ProductCard from '../components/ProductCard';
 const FavoritesScreen = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Получаем массив ID избранных товаров из нашего хранилища
   const favoriteIds = useCartStore((state) => state.favorites);
 
-  // Загружаем ВСЕ товары один раз при загрузке экрана
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -25,9 +22,9 @@ const FavoritesScreen = () => {
     fetchProducts();
   }, []);
 
-  // Фильтруем все товары, оставляя только те, чьи ID есть в списке избранных
-  // useMemo кэширует результат, чтобы фильтрация не запускалась при каждой перерисовке
   const favoriteProducts = useMemo(() => {
+    // Добавляем проверку, что allProducts - это массив
+    if (!Array.isArray(allProducts)) return [];
     return allProducts.filter(product => favoriteIds.includes(product.$id));
   }, [allProducts, favoriteIds]);
 
@@ -39,7 +36,7 @@ const FavoritesScreen = () => {
     <div className="favorites-screen">
       <h1>Избранные товары</h1>
       {favoriteProducts.length === 0 ? (
-        <p className="favorites-empty">Вы еще ничего не добавили в избранное. Нажмите на сердечко на товаре, чтобы сохранить его здесь.</p>
+        <p className="favorites-empty">Вы еще ничего не добавили в избранное.</p>
       ) : (
         <div className="products-grid">
           {favoriteProducts.map(product => (
