@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { databases, DATABASE_ID, CATEGORIES_COLLECTION_ID, PRODUCTS_COLLECTION_ID } from '../lib/appwrite';
 import ProductCard from '../components/ProductCard';
+import WebApp from '@twa-dev/sdk'; // <--- НОВЫЙ ИМПОРТ
 
 const HomeScreen = () => {
   const [categories, setCategories] = useState([]);
@@ -31,7 +32,7 @@ const HomeScreen = () => {
         setProducts(productsResponse.documents);
         
         if (sortedCategories.length > 0) {
-          setActiveCategory(sortedCategories[0].$id); // Устанавливаем первую категорию активной по умолчанию
+          setActiveCategory(sortedCategories[0].$id);
         }
         console.log("[HomeScreen] Data fetched successfully. Categories:", sortedCategories, "Products:", productsResponse.documents);
       } catch (error) {
@@ -45,25 +46,40 @@ const HomeScreen = () => {
     fetchData();
   }, []); 
 
-  // --- ЛОГИКА ПРОКРУТКИ К РАЗДЕЛУ КАТЕГОРИИ ---
   const handleCategoryClick = (categoryId) => {
     console.log("[HomeScreen] Category clicked:", categoryId); 
-    setActiveCategory(categoryId); // Подсвечиваем активную кнопку
+    setActiveCategory(categoryId);
 
-    const element = document.getElementById(`category-section-${categoryId}`); // Ищем заголовок категории
+    const element = document.getElementById(`category-section-${categoryId}`);
     
     if (element) {
-      console.log("[HomeScreen] Category section element found. Attempting to scroll..."); // DEBUG: Добавлен лог перед прокруткой
-      const headerOffset = 70; // Примерный размер вашей шапки
-      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = elementPosition - headerOffset;
+      console.log("[HomeScreen] Category section element found. Attempting to scroll with WebApp.scrollTo...");
+      
+      const headerOffset = 70; 
+      // getBoundingClientRect().top дает позицию элемента относительно ВЬЮПОРТА.
+      // Чтобы получить позицию относительно НАЧАЛА СКРОЛЛИРУЕМОЙ ОБЛАСТИ (которая управляется WebApp),
+      // нужно добавить текущую позицию прокрутки самого скроллируемого контейнера.
+      // В нашем случае скроллируемый контейнер - это .main-content
+      const mainContent = document.querySelector('.main-content');
+      const currentScrollTop = mainContent ? mainContent.scrollTop : window.pageYOffset; // Предполагаем, что скролл внутри .main-content
+      
+      const elementPosition = element.getBoundingClientRect().top + currentScrollTop; // Позиция относительно начала скроллируемого контента
+      const offsetPosition = elementPosition - headerOffset; // Учитываем шапку
 
-      console.log("[HomeScreen] Scrolling to position:", offsetPosition, "Element top:", element.getBoundingClientRect().top, "Window Y Offset:", window.pageYOffset); // DEBUG: Этот лог должен появиться!
+      console.log("[HomeScreen] Calculated scroll target (y):", offsetPosition, "Element top:", element.getBoundingClientRect().top, "Current scroll top:", currentScrollTop);
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
+      // --- ИЗМЕНЕНИЕ ЗДЕСЬ: ИСПОЛЬЗУЕМ WebApp.scrollTo() ---
+      if (WebApp && WebApp.scrollTo) {
+        WebApp.scrollTo(offsetPosition);
+        console.log("[HomeScreen] WebApp.scrollTo called.");
+      } else {
+        // Fallback на window.scrollTo, если WebApp SDK недоступен (например, вне Telegram)
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+        console.warn("[HomeScreen] WebApp.scrollTo not available, falling back to window.scrollTo.");
+      }
     } else {
       console.warn(`[HomeScreen] Category section element with ID category-section-${categoryId} not found in DOM.`); 
     }
@@ -83,7 +99,7 @@ const HomeScreen = () => {
       if (orderA !== orderB) {
         return orderA - orderB;
       }
-      return a.$id.localeCompare(b.$id); // Для стабильного порядка внутри одной категории
+      return a.$id.localeCompare(b.$id);
     });
   }, [products, categories]);
 
